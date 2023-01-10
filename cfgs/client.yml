@@ -1,0 +1,25 @@
+dubbo:
+  request_timeout: "1s"
+  registries:
+    my_nacos:
+      protocol: nacos
+      address: mse-31a78442-nacos-ans.mse.aliyuncs.com:8848
+      group: myGroup
+      params:
+        nacos.logDir: ./log
+        nacos.logLevel: error
+  consumer:
+    request_timeout: 3s
+    references:
+      ServiceClientImpl:
+        protocol: tri
+        interface: dubbo.model # must be compatible with grpc or dubbo-java
+  logger:
+    zap-config:
+      level: info
+      output-paths: 
+        - "stdout"
+      error-output-paths: 
+        - "stderr"
+  shutdown:
+    internal-signal: true

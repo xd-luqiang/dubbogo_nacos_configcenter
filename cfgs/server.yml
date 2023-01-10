@@ -1,0 +1,30 @@
+dubbo:
+    registries:
+      my_nacos:
+        protocol: nacos
+        address: mse-31a78442-nacos-ans.mse.aliyuncs.com:8848
+        group: myGroup
+        params:
+          nacos.logDir: ./log
+          nacos.logLevel: error
+    logger:
+      zap-config:
+        level: info
+        output-paths: "stdout"
+        error-output-paths: "stderr"
+    metrics:
+      enable: true # default is true
+      path: /metrics
+      port: 9090 # default is 9090
+      namespace: public # default is dubbo 作为数据上报 metrics 的前缀
+    protocols:
+      triple:
+        name: tri
+        port: 20000
+    provider:
+      services:
+        Provider:
+          interface: dubbo.model # must be compatible with grpc or dubbo-java
+    shutdown:
+      internal-signal: true
+  

@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package model_service;
+option go_package = "./model_service";
+// protoc --go_out=. --go-triple_out=. ./model_service.proto
+enum ArrayDataType {
+  // Not a legal value for DataType. Used to indicate a DataType field
+  // has not been set.
+  DT_INVALID = 0;
+  // Data types that all computation devices are expected to be
+  // capable to support.
+  DT_FLOAT = 1;
+  DT_DOUBLE = 2;
+  DT_INT32 = 3;
+  DT_UINT8 = 4;
+  DT_INT16 = 5;
+  DT_INT8 = 6;
+  DT_STRING = 7;
+  DT_COMPLEX64 = 8;  // Single-precision complex.
+  DT_INT64 = 9;
+  DT_BOOL = 10;
+  DT_QINT8 = 11;     // Quantized int8.
+  DT_QUINT8 = 12;    // Quantized uint8.
+  DT_QINT32 = 13;    // Quantized int32.
+  DT_BFLOAT16 = 14;  // Float32 truncated to 16 bits.  Only for cast ops.
+  DT_QINT16 = 15;    // Quantized int16.
+  DT_QUINT16 = 16;   // Quantized uint16.
+  DT_UINT16 = 17;
+  DT_COMPLEX128 = 18;  // Double-precision complex.
+  DT_HALF = 19;
+  DT_RESOURCE = 20;
+  DT_VARIANT = 21;  // Arbitrary C++ data types.
+}
+
+// Dimensions of an array.
+message ArrayShape {
+  repeated int64 dim = 1 [packed = true];
+}
+// Protocol buffer representing an array.
+message ArrayProto {
+  // Data Type.
+  ArrayDataType dtype = 1;
+  // Shape of the array.
+  ArrayShape array_shape = 2;
+  // DT_FLOAT.
+  repeated float float_val = 3 [packed = true];
+  // DT_DOUBLE.
+  repeated double double_val = 4 [packed = true];
+  // DT_INT32, DT_INT16, DT_INT8, DT_UINT8.
+  repeated int32 int_val = 5 [packed = true];
+  // DT_STRING.
+  repeated bytes string_val = 6;
+  // DT_INT64.
+  repeated int64 int64_val = 7 [packed = true];
+  // DT_BOOL.
+  repeated bool bool_val = 8 [packed = true];
+}
+
+message CompressSchema {
+  repeated ArrayDataType type = 1;
+  repeated string name = 2;
+  repeated ArrayShape shape = 3;
+  string version = 4;
+}
+
+message CompressRecord {
+  string version = 1;
+  bytes filter = 2;
+  // DT_FLOAT.
+  repeated float float_val = 3 [packed = true];
+  // DT_DOUBLE.
+  repeated double double_val = 4 [packed = true];
+  // DT_INT32, DT_INT16, DT_INT8, DT_UINT8.
+  repeated int32 int_val = 5 [packed = true];
+  // DT_STRING.
+  repeated bytes string_val = 6;
+  // DT_INT64.
+  repeated int64 int64_val = 7 [packed = true];
+  // DT_BOOL.
+  repeated bool bool_val = 8 [packed = true];
+}
+
+
+service Service {
+  // Sends a greeting
+  rpc Get (Request) returns (Response) {}
+  // Sends a greeting via stream
+  rpc GetStream (stream Request) returns (stream Response) {}
+}
+
+message StringArray {
+    repeated string d = 1;
+}
+
+// The request message containing the user's name.
+message Request {
+  // input features from client (can be missing, length = 1 || size)
+  map<string, ArrayProto> inputs = 1;
+  // model name
+  string name = 2;
+  // request unique id
+  string uuid = 3;
+  // input table s(can be missing)
+  repeated string tables = 4;
+  // input keys for table fetch & parse (can be missing, length = 1 || size)
+  map<string, ArrayProto> key_map = 5;
+  // batch size
+  int32 size = 6;
+  enum RequestType {
+    Model = 0;
+    ModelCallback = 1;
+  }
+  // reuqest type
+  RequestType rtype = 7;
+}
+
+// The response message containing the greetings
+message Response {
+  map<string, ArrayProto> outputs = 1;
+}
